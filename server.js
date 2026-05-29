@@ -1,4 +1,4 @@
-// FORCE DEPLOYMENT PATCH VALUE 1.0.4
+// FORCE DEPLOYMENT PATCH VALUE 1.0.5
 const fastify = require('fastify')({ logger: true });
 const bcrypt = require('bcryptjs');
 const mongoose = require('mongoose');
@@ -29,7 +29,7 @@ const ProductSchema = new mongoose.Schema({
   name: { type: String, required: true },
   price: { type: Number, required: true },
   category: { type: String, default: 'Apparel' }, 
-  imageName: { type: String, default: 'new.jpg' }, // 🖼️ Updated schema fallback to new.jpg
+  imageName: { type: String, default: 'new.jpg' }, // Set fallback default here
   stock: { type: Number, required: true },
   description: { type: String, default: 'New premium arrival item curated for the collection.' } 
 });
@@ -120,14 +120,17 @@ fastify.get('/api/products/:id', async (request, reply) => {
   return product;
 });
 
-// ➕ POST ENDPOINT: Safely creates a brand-new item and sets image to new.jpg
+// ➕ POST ENDPOINT: Safely creates a brand-new item and explicitly forces new.jpg
 fastify.post('/api/products', async (request, reply) => {
   try {
     const { name, price, stock, category, imageName, description } = request.body;
 
-    // Use a robust sorting strategy to find the highest existing numeric ID value
+    // Find the highest existing numeric ID value to clean up sequencing
     const highestProduct = await Product.findOne().sort({ id: -1 });
     const newId = highestProduct && highestProduct.id ? highestProduct.id + 1 : 1;
+
+    // Explicitly enforce 'new.jpg' at execution time if undefined or blank strings arrive
+    const targetImage = (imageName && imageName.trim() !== "") ? imageName : "new.jpg";
 
     const newProduct = await Product.create({
       id: Number(newId),
@@ -135,7 +138,7 @@ fastify.post('/api/products', async (request, reply) => {
       price: price ? Number(price) : 0.00,
       stock: stock ? Number(stock) : 0,
       category: category || "Apparel",
-      imageName: imageName || "new.jpg", // 🖼️ Updated creation fallback to new.jpg
+      imageName: targetImage, // Forced explicit setting
       description: description || "New premium arrival item curated for the collection."
     });
 
