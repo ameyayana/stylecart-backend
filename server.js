@@ -4,8 +4,9 @@ const mongoose = require('mongoose');
 
 // Enable Cross-Origin Resource Sharing so Vercel can communicate with Render
 fastify.register(require('@fastify/cors'), { 
-  origin: '*', 
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'] 
+  origin: true, // Dynamically allows the incoming origin (Vercel)
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization']
 });
 
 fastify.register(require('@fastify/jwt'), { 
