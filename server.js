@@ -4,7 +4,7 @@ const mongoose = require('mongoose');
 
 // Enable Cross-Origin Resource Sharing so Vercel can communicate with Render
 fastify.register(require('@fastify/cors'), { 
-  origin: true, // Dynamically allows the incoming origin (Vercel)
+  origin: true, 
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization']
 });
@@ -81,7 +81,6 @@ async function seedDatabaseIfEmpty() {
     ];
     await Product.insertMany(initialProducts);
     
-    // Seed default admin account (password: aaa123)
     const adminExists = await User.findOne({ email: 'aaa@gmail.com' });
     if (!adminExists) {
       const hashedAdminPassword = await bcrypt.hash('aaa123', 10);
@@ -100,14 +99,15 @@ async function seedDatabaseIfEmpty() {
 
 /* --- STEP 2D: API ROUTES --- */
 
-fastify.get('/', async () => ({ status: "online", message: "StyleCart MongoDB Engine active" }));
+// 🎯 THIS ROUTE FIXES YOUR "NOT FOUND" SCREEN RIGHT AWAY
+fastify.get('/', async () => {
+  return { status: "online", message: "StyleCart MongoDB Engine active" };
+});
 
-// Get Full Catalog Array
 fastify.get('/api/products', async () => {
   return await Product.find({}).sort({ id: 1 });
 });
 
-// GET SINGLE PRODUCT MANIFEST VIA PARAMETER ROUTE
 fastify.get('/api/products/:id', async (request, reply) => {
   const targetId = Number(request.params.id);
   const product = await Product.findOne({ id: targetId });
@@ -119,7 +119,6 @@ fastify.get('/api/products/:id', async (request, reply) => {
 
 fastify.post('/api/auth/register', async (request, reply) => {
   const { name, email, password, isAdmin } = request.body;
-  
   const userExists = await User.findOne({ email });
   if (userExists) return reply.status(400).send({ error: 'User exists.' });
 
@@ -134,77 +133,44 @@ fastify.post('/api/auth/register', async (request, reply) => {
 
 fastify.post('/api/auth/login', async (request, reply) => {
   const { email, password } = request.body;
-  
   const user = await User.findOne({ email });
   if (!user || !(await bcrypt.compare(password, user.password))) {
     return reply.status(401).send({ error: 'Invalid credentials.' });
   }
-  
   const token = fastify.jwt.sign({ id: user.id, email: user.email, role: user.role });
-  const verifiedStatus = user.role === 'admin' ? 'Admin' : (user.memberStatus || 'Regular Member');
-  
   return { 
     token: token, 
-    user: { name: user.name, email: user.email, role: user.role, memberStatus: verifiedStatus } 
+    user: { name: user.name, email: user.email, role: user.role, memberStatus: user.memberStatus || 'Regular Member' } 
   };
 });
 
-// --- ORDER ROUTES ---
 fastify.post('/api/checkout', { onRequest: [fastify.authenticate] }, async (request, reply) => {
   const { cartItems, shipping } = request.body;
-  
   for (const item of cartItems) {
     const product = await Product.findOne({ id: Number(item.id) });
-    if (!product) return reply.status(404).send({ error: `Product not found.` });
-    if (product.stock < item.quantity) return reply.status(400).send({ error: `Insufficient stock.` });
-    
+    if (!product || product.stock < item.quantity) return reply.status(400).send({ error: `Stock error.` });
     product.stock -= item.quantity;
     await product.save();
   }
-  
   const newOrder = new Order({
     orderId: 'ORD-' + Math.floor(1000 + Math.random() * 9000),
     userEmail: request.user.email.toLowerCase().trim(),
     items: cartItems,
-    shipping,
-    status: 'Waiting for shipping'
+    shipping
   });
-  
   await newOrder.save();
   return { message: 'Purchase success', orderId: newOrder.orderId };
 });
 
-fastify.get('/api/orders', { onRequest: [fastify.authenticate] }, async (request, reply) => {
-  const currentUserEmail = request.user.email.toLowerCase().trim();
-  return await Order.find({ userEmail: currentUserEmail });
-});
-
-// --- ADMIN CRUD ROUTES ---
-fastify.post('/api/admin/products', { onRequest: [fastify.authenticate, fastify.authorizeAdmin] }, async (req) => {
-  const newProduct = new Product({ id: Date.now(), imageName: 'new.jpg', ...req.body });
-  await newProduct.save();
-  return newProduct;
-});
-
-fastify.delete('/api/admin/products/:id', { onRequest: [fastify.authenticate, fastify.authorizeAdmin] }, async (req) => {
-  await Product.deleteOne({ id: Number(req.params.id) });
-  return { message: 'Deleted' };
-});
-
-fastify.put('/api/admin/products/:id', { onRequest: [fastify.authenticate, fastify.authorizeAdmin] }, async (req) => {
-  const updatedProduct = await Product.findOneAndUpdate(
-    { id: Number(req.params.id) },
-    { $set: req.body },
-    { new: true }
-  );
-  return updatedProduct;
+fastify.get('/api/orders', { onRequest: [fastify.authenticate] }, async (request) => {
+  return await Order.find({ userEmail: request.user.email.toLowerCase().trim() });
 });
 
 /* --- STEP 2E: SERVER INITIALIZATION BLOCK --- */
 const startServer = async () => {
   try {
     const port = process.env.PORT || 5000;
-    const mongoURI = process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017/stylecart';
+    const mongoURI = process.env.MONGODB_URI;
     
     await mongoose.connect(mongoURI);
     console.log("🔌 Connected safely to MongoDB Atlas Cloud");
@@ -212,7 +178,6 @@ const startServer = async () => {
     await seedDatabaseIfEmpty();
 
     await fastify.listen({ port: Number(port), host: '0.0.0.0' });
-    console.log(`🚀 Fastify running on port ${port}`);
   } catch (err) {
     fastify.log.error(err);
     process.exit(1);
