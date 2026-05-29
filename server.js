@@ -4,8 +4,15 @@ const fs = require('fs');
 const path = require('path');
 const dbPath = path.resolve(__dirname, 'database.json');
 
-fastify.register(require('@fastify/cors'), { origin: '*', methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'] });
-fastify.register(require('@fastify/jwt'), { secret: 'super-secret-stylish-key-change-this-in-production' });
+// Enable Cross-Origin Resource Sharing so your Vercel frontend can talk to your Render backend
+fastify.register(require('@fastify/cors'), { 
+  origin: '*', 
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'] 
+});
+
+fastify.register(require('@fastify/jwt'), { 
+  secret: 'super-secret-stylish-key-change-this-in-production' 
+});
 
 /* --- DATABASE UTILITIES --- */
 function readDatabase() {
@@ -56,7 +63,6 @@ fastify.post('/api/auth/register', async (request, reply) => {
   const hashedPassword = await bcrypt.hash(password, 10);
   const role = isAdmin ? 'admin' : 'customer';
   
-  // FIX: Dynamic status allocation based on the user's role assignment
   const memberStatus = role === 'admin' ? 'Admin' : 'Regular Member';
 
   db.users.push({ 
@@ -86,8 +92,6 @@ fastify.post('/api/auth/login', async (request, reply) => {
     role: user.role 
   });
   
-  // FIX: Backup fallback check. If an older admin account has "Regular Member" 
-  // saved in the JSON file, this safely overrides it during login.
   const verifiedStatus = user.role === 'admin' ? 'Admin' : (user.memberStatus || 'Regular Member');
   
   return { 
@@ -162,10 +166,15 @@ fastify.put('/api/admin/products/:id', { onRequest: [fastify.authenticate, fasti
   return db.products[index];
 });
 
+/* --- FIXED SERVER LIFECYCLE INITIALIZATION BLOCK --- */
 const startServer = async () => {
   try {
-    await fastify.listen({ port: 5000, host: '127.0.0.1' });
-    console.log('🚀 StyleCart Backend running on http://localhost:5000');
+    // 1. Accept Render's dynamic port assignment or fall back to 5000 locally
+    const port = process.env.PORT || 5000;
+
+    // 2. Bind host to 0.0.0.0 so Render's internal proxy routers can direct traffic to it
+    await fastify.listen({ port: Number(port), host: '0.0.0.0' });
+    console.log(`🚀 StyleCart Fastify Engine successfully live on port ${port}`);
   } catch (err) {
     fastify.log.error(err);
     process.exit(1);
