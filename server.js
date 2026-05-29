@@ -1,4 +1,4 @@
-// FORCE DEPLOYMENT PATCH VALUE 1.0.3
+// FORCE DEPLOYMENT PATCH VALUE 1.0.4
 const fastify = require('fastify')({ logger: true });
 const bcrypt = require('bcryptjs');
 const mongoose = require('mongoose');
@@ -28,10 +28,10 @@ const ProductSchema = new mongoose.Schema({
   id: { type: Number, unique: true },
   name: { type: String, required: true },
   price: { type: Number, required: true },
-  category: { type: String, default: 'Apparel' }, // Changed to default for creation flexibility
-  imageName: { type: String, default: 'skirt.jpg' }, // Changed to default
+  category: { type: String, default: 'Apparel' }, 
+  imageName: { type: String, default: 'new.jpg' }, // 🖼️ Updated schema fallback to new.jpg
   stock: { type: Number, required: true },
-  description: { type: String, default: 'New premium arrival item curated for the collection.' } // Changed to default
+  description: { type: String, default: 'New premium arrival item curated for the collection.' } 
 });
 
 const OrderSchema = new mongoose.Schema({
@@ -120,7 +120,7 @@ fastify.get('/api/products/:id', async (request, reply) => {
   return product;
 });
 
-// ➕ FIXED ENDPOINT: Safely creates a brand-new item even with sparse frontend forms
+// ➕ POST ENDPOINT: Safely creates a brand-new item and sets image to new.jpg
 fastify.post('/api/products', async (request, reply) => {
   try {
     const { name, price, stock, category, imageName, description } = request.body;
@@ -135,7 +135,7 @@ fastify.post('/api/products', async (request, reply) => {
       price: price ? Number(price) : 0.00,
       stock: stock ? Number(stock) : 0,
       category: category || "Apparel",
-      imageName: imageName || "skirt.jpg",
+      imageName: imageName || "new.jpg", // 🖼️ Updated creation fallback to new.jpg
       description: description || "New premium arrival item curated for the collection."
     });
 
@@ -169,7 +169,7 @@ fastify.put('/api/products/:id', async (request, reply) => {
   }
 });
 
-// ❌ NEW ENDPOINT: Safely completely removes item records via custom ID matching
+// ❌ DELETE ENDPOINT: Safely completely removes item records via custom ID matching
 fastify.delete('/api/products/:id', async (request, reply) => {
   try {
     const targetId = Number(request.params.id);
