@@ -1,4 +1,4 @@
-// FORCE DEPLOYMENT PATCH VALUE 1.0.1
+// FORCE DEPLOYMENT PATCH VALUE 1.0.2
 const fastify = require('fastify')({ logger: true });
 const bcrypt = require('bcryptjs');
 const mongoose = require('mongoose');
@@ -120,7 +120,33 @@ fastify.get('/api/products/:id', async (request, reply) => {
   return product;
 });
 
-// 🔄 NEW ENDPOINT: Updates specific product parameters from administrative forms
+// ➕ NEW ENDPOINT: Handles creating a brand-new inventory product profile
+fastify.post('/api/products', async (request, reply) => {
+  try {
+    const { name, price, stock, category, imageName, description } = request.body;
+
+    // Dynamically auto-increment custom numeric IDs based on database totals
+    const totalProducts = await Product.countDocuments();
+    const newId = totalProducts + 1;
+
+    const newProduct = await Product.create({
+      id: newId,
+      name,
+      price: Number(price),
+      stock: Number(stock),
+      category: category || "Apparel",
+      imageName: imageName || "skirt.jpg",
+      description: description || "New premium arrival item curated for the collection."
+    });
+
+    return reply.status(201).send({ message: "Product created successfully!", product: newProduct });
+  } catch (err) {
+    fastify.log.error(err);
+    return reply.status(500).send({ error: "Internal processing failure while building product profile." });
+  }
+});
+
+// 🔄 EXISTING ENDPOINT: Updates specific product parameters from administrative forms
 fastify.put('/api/products/:id', async (request, reply) => {
   try {
     const targetId = Number(request.params.id);
@@ -140,6 +166,23 @@ fastify.put('/api/products/:id', async (request, reply) => {
   } catch (err) {
     fastify.log.error(err);
     return reply.status(500).send({ error: "Internal processing failure during profile rewrite." });
+  }
+});
+
+// ❌ NEW ENDPOINT: Safely completely removes item records via custom ID matching
+fastify.delete('/api/products/:id', async (request, reply) => {
+  try {
+    const targetId = Number(request.params.id);
+    const deletedProduct = await Product.findOneAndDelete({ id: targetId });
+
+    if (!deletedProduct) {
+      return reply.status(404).send({ error: "Target product record could not be found to drop." });
+    }
+
+    return { message: "Product successfully cleared from cluster catalog storage." };
+  } catch (err) {
+    fastify.log.error(err);
+    return reply.status(500).send({ error: "Internal error processing item structural drop sequence." });
   }
 });
 
