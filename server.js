@@ -102,8 +102,19 @@ async function seedDatabaseIfEmpty() {
 
 fastify.get('/', async () => ({ status: "online", message: "StyleCart MongoDB Engine active" }));
 
+// Get Full Catalog Array
 fastify.get('/api/products', async () => {
   return await Product.find({}).sort({ id: 1 });
+});
+
+// GET SINGLE PRODUCT MANIFEST VIA PARAMETER ROUTE
+fastify.get('/api/products/:id', async (request, reply) => {
+  const targetId = Number(request.params.id);
+  const product = await Product.findOne({ id: targetId });
+  if (!product) {
+    return reply.status(404).send({ error: "Product profile could not be located." });
+  }
+  return product;
 });
 
 fastify.post('/api/auth/register', async (request, reply) => {
@@ -193,14 +204,11 @@ fastify.put('/api/admin/products/:id', { onRequest: [fastify.authenticate, fasti
 const startServer = async () => {
   try {
     const port = process.env.PORT || 5000;
-    
-    // Connect securely using your Render environment string variable
     const mongoURI = process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017/stylecart';
     
     await mongoose.connect(mongoURI);
     console.log("🔌 Connected safely to MongoDB Atlas Cloud");
 
-    // Automatically feed items if database is totally fresh
     await seedDatabaseIfEmpty();
 
     await fastify.listen({ port: Number(port), host: '0.0.0.0' });
