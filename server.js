@@ -1,4 +1,4 @@
-// FORCE DEPLOYMENT PATCH VALUE 1.0.0
+// FORCE DEPLOYMENT PATCH VALUE 1.0.1
 const fastify = require('fastify')({ logger: true });
 const bcrypt = require('bcryptjs');
 const mongoose = require('mongoose');
@@ -100,15 +100,17 @@ async function seedDatabaseIfEmpty() {
 
 /* --- STEP 2D: API ROUTES --- */
 
-// 🎯 THIS ROUTE FIXES YOUR "NOT FOUND" SCREEN RIGHT AWAY
+// Root URL Health Check Route
 fastify.get('/', async () => {
   return { status: "online", message: "StyleCart MongoDB Engine active" };
 });
 
+// Fetch All Products Route
 fastify.get('/api/products', async () => {
   return await Product.find({}).sort({ id: 1 });
 });
 
+// Fetch Single Product Route
 fastify.get('/api/products/:id', async (request, reply) => {
   const targetId = Number(request.params.id);
   const product = await Product.findOne({ id: targetId });
@@ -118,6 +120,30 @@ fastify.get('/api/products/:id', async (request, reply) => {
   return product;
 });
 
+// 🔄 NEW ENDPOINT: Updates specific product parameters from administrative forms
+fastify.put('/api/products/:id', async (request, reply) => {
+  try {
+    const targetId = Number(request.params.id);
+    const { name, price, stock } = request.body;
+
+    const updatedProduct = await Product.findOneAndUpdate(
+      { id: targetId },
+      { name, price: Number(price), stock: Number(stock) },
+      { new: true }
+    );
+
+    if (!updatedProduct) {
+      return reply.status(404).send({ error: "Product profile could not be found to modify." });
+    }
+
+    return { message: "Product updated successfully!", product: updatedProduct };
+  } catch (err) {
+    fastify.log.error(err);
+    return reply.status(500).send({ error: "Internal processing failure during profile rewrite." });
+  }
+});
+
+// User Registration Route
 fastify.post('/api/auth/register', async (request, reply) => {
   const { name, email, password, isAdmin } = request.body;
   const userExists = await User.findOne({ email });
@@ -132,6 +158,7 @@ fastify.post('/api/auth/register', async (request, reply) => {
   return reply.status(201).send({ message: 'Success' });
 });
 
+// User Login Route
 fastify.post('/api/auth/login', async (request, reply) => {
   const { email, password } = request.body;
   const user = await User.findOne({ email });
@@ -145,6 +172,7 @@ fastify.post('/api/auth/login', async (request, reply) => {
   };
 });
 
+// Checkout Route
 fastify.post('/api/checkout', { onRequest: [fastify.authenticate] }, async (request, reply) => {
   const { cartItems, shipping } = request.body;
   for (const item of cartItems) {
@@ -163,6 +191,7 @@ fastify.post('/api/checkout', { onRequest: [fastify.authenticate] }, async (requ
   return { message: 'Purchase success', orderId: newOrder.orderId };
 });
 
+// Order History Lookup Route
 fastify.get('/api/orders', { onRequest: [fastify.authenticate] }, async (request) => {
   return await Order.find({ userEmail: request.user.email.toLowerCase().trim() });
 });
