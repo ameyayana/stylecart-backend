@@ -1,4 +1,4 @@
-// FORCE DEPLOYMENT PATCH VALUE 1.0.5
+// FORCE DEPLOYMENT PATCH VALUE 1.0.6
 const fastify = require('fastify')({ logger: true });
 const bcrypt = require('bcryptjs');
 const mongoose = require('mongoose');
@@ -29,7 +29,7 @@ const ProductSchema = new mongoose.Schema({
   name: { type: String, required: true },
   price: { type: Number, required: true },
   category: { type: String, default: 'Apparel' }, 
-  imageName: { type: String, default: 'new.jpg' }, // Set fallback default here
+  imageName: { type: String, default: 'new.jpg' }, 
   stock: { type: Number, required: true },
   description: { type: String, default: 'New premium arrival item curated for the collection.' } 
 });
@@ -120,16 +120,25 @@ fastify.get('/api/products/:id', async (request, reply) => {
   return product;
 });
 
-// ➕ POST ENDPOINT: Safely creates a brand-new item and explicitly forces new.jpg
+// ➕ FIXED POST ENDPOINT: Calculates true maximum numeric ID and forces new.jpg
 fastify.post('/api/products', async (request, reply) => {
   try {
     const { name, price, stock, category, imageName, description } = request.body;
 
-    // Find the highest existing numeric ID value to clean up sequencing
-    const highestProduct = await Product.findOne().sort({ id: -1 });
-    const newId = highestProduct && highestProduct.id ? highestProduct.id + 1 : 1;
+    // Fetch all existing records to manually guarantee tracking above seed item IDs (like 12)
+    const allProducts = await Product.find({});
+    let maxId = 0;
+    
+    allProducts.forEach(product => {
+      const numericId = parseInt(product.id, 10);
+      if (!isNaN(numericId) && numericId > maxId) {
+        maxId = numericId;
+      }
+    });
+    
+    const newId = maxId + 1;
 
-    // Explicitly enforce 'new.jpg' at execution time if undefined or blank strings arrive
+    // Explicitly fallback to 'new.jpg' if left blank or missing from request payloads
     const targetImage = (imageName && imageName.trim() !== "") ? imageName : "new.jpg";
 
     const newProduct = await Product.create({
@@ -138,7 +147,7 @@ fastify.post('/api/products', async (request, reply) => {
       price: price ? Number(price) : 0.00,
       stock: stock ? Number(stock) : 0,
       category: category || "Apparel",
-      imageName: targetImage, // Forced explicit setting
+      imageName: targetImage, 
       description: description || "New premium arrival item curated for the collection."
     });
 
