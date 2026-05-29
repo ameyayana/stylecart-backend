@@ -1,4 +1,4 @@
-// FORCE DEPLOYMENT PATCH VALUE 1.0.2
+// FORCE DEPLOYMENT PATCH VALUE 1.0.3
 const fastify = require('fastify')({ logger: true });
 const bcrypt = require('bcryptjs');
 const mongoose = require('mongoose');
@@ -28,10 +28,10 @@ const ProductSchema = new mongoose.Schema({
   id: { type: Number, unique: true },
   name: { type: String, required: true },
   price: { type: Number, required: true },
-  category: { type: String, required: true },
-  imageName: { type: String, required: true },
+  category: { type: String, default: 'Apparel' }, // Changed to default for creation flexibility
+  imageName: { type: String, default: 'skirt.jpg' }, // Changed to default
   stock: { type: Number, required: true },
-  description: { type: String, required: true }
+  description: { type: String, default: 'New premium arrival item curated for the collection.' } // Changed to default
 });
 
 const OrderSchema = new mongoose.Schema({
@@ -120,20 +120,20 @@ fastify.get('/api/products/:id', async (request, reply) => {
   return product;
 });
 
-// ➕ NEW ENDPOINT: Handles creating a brand-new inventory product profile
+// ➕ FIXED ENDPOINT: Safely creates a brand-new item even with sparse frontend forms
 fastify.post('/api/products', async (request, reply) => {
   try {
     const { name, price, stock, category, imageName, description } = request.body;
 
-    // Dynamically auto-increment custom numeric IDs based on database totals
-    const totalProducts = await Product.countDocuments();
-    const newId = totalProducts + 1;
+    // Use a robust sorting strategy to find the highest existing numeric ID value
+    const highestProduct = await Product.findOne().sort({ id: -1 });
+    const newId = highestProduct && highestProduct.id ? highestProduct.id + 1 : 1;
 
     const newProduct = await Product.create({
-      id: newId,
-      name,
-      price: Number(price),
-      stock: Number(stock),
+      id: Number(newId),
+      name: name || "New Catalog Piece",
+      price: price ? Number(price) : 0.00,
+      stock: stock ? Number(stock) : 0,
       category: category || "Apparel",
       imageName: imageName || "skirt.jpg",
       description: description || "New premium arrival item curated for the collection."
