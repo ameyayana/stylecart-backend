@@ -1,0 +1,341 @@
+{
+  "users": [
+    {
+      "id": 1,
+      "name": "Amelia Farhana Binti Azizan",
+      "email": "aaa@gmail.com",
+      "password": "$2b$10$g/xZvA4MQafIli9aqe2Q0.GVE9mJQFXak753WNK/0LuP4oeLVXikO",
+      "memberStatus": "Admin",
+      "role": "admin"
+    },
+    {
+      "id": 2,
+      "name": "bb",
+      "email": "bbb@gmail.com",
+      "password": "$2b$10$UWOw291UuLAQmj9MTpCxrOxzxAZNBGuPGO38CDRRRbMLQQDIMmk0S",
+      "memberStatus": "Gold Member",
+      "role": "customer"
+    },
+    {
+      "id": 3,
+      "name": "cc",
+      "email": "ccc@gmail.com",
+      "password": "$2b$10$IqFMPPsmb/.DZCh4fshDtu31MVtd0a2bCmybC/Q1rdAPTRGv.VD1S",
+      "memberStatus": "Gold Member",
+      "role": "customer"
+    },
+    {
+      "id": 4,
+      "name": "dd",
+      "email": "ddd@gmail.com",
+      "password": "$2b$10$38Jw7CRgSVvmH3lrGT8Jfu7lB.NX1MqYPPasBXyEIWN.z/b15hp1G",
+      "memberStatus": "Admin",
+      "role": "admin"
+    },
+    {
+      "id": 5,
+      "name": "ee",
+      "email": "eee@gmail.com",
+      "password": "$2b$10$K4uRhG58Jl8nzJUgPDrcYeHikIXV8UT6MVfejthl/jKMuBdrB4sFS",
+      "role": "admin",
+      "memberStatus": "Regular Member"
+    }
+  ],
+  "products": [
+    {
+      "id": 1,
+      "name": "Piano Skirt",
+      "price": 79.9,
+      "category": "Apparel",
+      "imageName": "skirt.jpg",
+      "stock": 8,
+      "description": "A striking monochrome piece featuring a vintage pleated piano-key design."
+    },
+    {
+      "id": 2,
+      "name": "Forest Skirt",
+      "price": 69.9,
+      "category": "Apparel",
+      "imageName": "skirt2.jpg",
+      "stock": 4,
+      "description": "Rich emerald green wool-blend textured skirt featuring unique architectural slit cuts."
+    },
+    {
+      "id": 12,
+      "name": "Polka Skirt",
+      "price": 59.9,
+      "category": "Apparel",
+      "imageName": "skirt3.jpg",
+      "stock": 11,
+      "description": "A classic retro style updated for modern street style curation."
+    },
+    {
+      "id": 3,
+      "name": "Brown Leather Jacket",
+      "price": 59.9,
+      "category": "Apparel",
+      "imageName": "jacket.jpg",
+      "stock": 2,
+      "description": "Authentic oversized heavy-drop vintage leather jacket."
+    },
+    {
+      "id": 4,
+      "name": "Red Leather Jacket",
+      "price": 69.9,
+      "category": "Apparel",
+      "imageName": "jacket3.jpg",
+      "stock": 5,
+      "description": "Bold cherry-red statement leather jacket with a clean minimalist silhouette."
+    },
+    {
+      "id": 5,
+      "name": "Reversible Jacket",
+      "price": 129.9,
+      "category": "Apparel",
+      "imageName": "jacket2.jpg",
+      "stock": 2,
+      "description": "Premium multi-functional heavy utility jacket featuring a fully reversible interior design phase."
+    },
+    {
+      "id": 6,
+      "name": "Shorts",
+      "price": 49.9,
+      "category": "Apparel",
+      "imageName": "pants.jpg",
+      "stock": 20,
+      "description": "Comfortable streetwear-ready tailored lounge shorts."
+    },
+    {
+      "id": 7,
+      "name": "Jean Shorts",
+      "price": 59.9,
+      "category": "Apparel",
+      "imageName": "pants2.jpg",
+      "stock": 12,
+      "description": "Relaxed-fit raw denim shorts featuring custom edge profiling."
+    },
+    {
+      "id": 8,
+      "name": "Brown Pants",
+      "price": 49.9,
+      "category": "Apparel",
+      "imageName": "pants3.jpg",
+      "stock": 10,
+      "description": "Classic earthy tone relaxed utility trousers."
+    },
+    {
+      "id": 9,
+      "name": "Star Sweater",
+      "price": 69.9,
+      "category": "Apparel",
+      "imageName": "sweater.jpg",
+      "stock": 7,
+      "description": "Cozy knit winter pullover detailed with signature woven star silhouettes."
+    },
+    {
+      "id": 10,
+      "name": "Cat Sweater",
+      "price": 69.9,
+      "category": "Apparel",
+      "imageName": "sweater2.jpg",
+      "stock": 5,
+      "description": "Whimsical contemporary knit style celebrating street-level graphic design elements."
+    }
+  ],
+  "orders": [
+    {
+      "orderId": "ORD-9400",
+      "userEmail": "aaa@gmail.com",
+      "items": [
+        {
+          "id": 12,
+          "name": "Polka Skirt",
+          "price": 59.9,
+          "quantity": 1
+        }
+      ],
+      "shipping": {
+        "name": "Amelia Farhana Binti Azizan",
+        "address": "24, Taman Soleen, Jalan Merdeka",
+        "city": "Kuching",
+        "postcode": "93050"
+      },
+      "status": "Waiting for shipping",
+      "timestamp": "2026-05-27T05:19:47.516Z"
+    },
+    {
+      "orderId": "ORD-7774",
+      "userEmail": "aaa@gmail.com",
+      "items": [
+        {
+          "id": 2,
+          "name": "Forest Skirt",
+          "price": 69.9,
+          "quantity": 1
+        }
+      ],
+      "shipping": {
+        "name": "Amelia Farhana Binti Azizan",
+        "address": "24, Taman Soleen, Jalan Merdeka",
+        "city": "Kuching",
+        "postcode": "93050"
+      },
+      "status": "Waiting for shipping",
+      "timestamp": "2026-05-27T05:28:57.331Z"
+    },
+    {
+      "orderId": "ORD-7895",
+      "userEmail": "bbb@gmail.com",
+      "items": [
+        {
+          "id": 2,
+          "name": "Forest Skirt",
+          "price": 69.9,
+          "imageName": "skirt2.jpg",
+          "category": "Apparel",
+          "quantity": 1
+        }
+      ],
+      "shipping": {
+        "name": "Amelia Farhana Binti Azizan",
+        "address": "24 , Taman Soleen , Jalan Merdeka , Off Jln Astana",
+        "city": "Kuching",
+        "postcode": "93050"
+      },
+      "status": "Waiting for shipping",
+      "timestamp": "2026-05-27T05:32:26.445Z"
+    },
+    {
+      "orderId": "ORD-8732",
+      "userEmail": "bbb@gmail.com",
+      "items": [
+        {
+          "id": 1,
+          "name": "Piano Skirt",
+          "price": 79.9,
+          "imageName": "skirt.jpg",
+          "category": "Apparel",
+          "quantity": 1
+        }
+      ],
+      "shipping": {
+        "name": "Amelia Farhana Binti Azizan",
+        "address": "24 , Taman Soleen , Jalan Merdeka , Off Jln Astana",
+        "city": "Kuching",
+        "postcode": "93050"
+      },
+      "status": "Waiting for shipping",
+      "timestamp": "2026-05-27T05:36:55.820Z"
+    },
+    {
+      "orderId": "ORD-3471",
+      "userEmail": "bbb@gmail.com",
+      "items": [
+        {
+          "id": 2,
+          "name": "Forest Skirt",
+          "price": 69.9,
+          "imageName": "skirt2.jpg",
+          "category": "Apparel",
+          "quantity": 1
+        }
+      ],
+      "shipping": {
+        "name": "Amelia Farhana Binti Azizan",
+        "address": "24 , Taman Soleen , Jalan Merdeka , Off Jln Astana",
+        "city": "Kuching",
+        "postcode": "93050"
+      },
+      "status": "Waiting for shipping",
+      "timestamp": "2026-05-27T05:45:21.683Z"
+    },
+    {
+      "orderId": "ORD-3268",
+      "userEmail": "bbb@gmail.com",
+      "items": [
+        {
+          "id": 12,
+          "name": "Polka Skirt",
+          "price": 59.9,
+          "imageName": "skirt3.jpg",
+          "category": "Apparel",
+          "quantity": 1
+        }
+      ],
+      "shipping": {
+        "name": "bb",
+        "address": "24 , Taman Soleen , Jalan Merdeka , Off Jln Astana",
+        "city": "Kuching",
+        "postcode": "93050"
+      },
+      "status": "Waiting for shipping",
+      "timestamp": "2026-05-27T16:56:32.057Z"
+    },
+    {
+      "orderId": "ORD-1693",
+      "userEmail": "bbb@gmail.com",
+      "items": [
+        {
+          "id": 3,
+          "name": "Brown Leather Jacket",
+          "price": 59.9,
+          "imageName": "jacket.jpg",
+          "category": "Apparel",
+          "quantity": 1
+        }
+      ],
+      "shipping": {
+        "name": "bb",
+        "address": "24 , Taman Soleen , Jalan Merdeka , Off Jln Astana",
+        "city": "Kuching",
+        "postcode": "93050"
+      },
+      "status": "Waiting for shipping",
+      "timestamp": "2026-05-27T16:56:49.657Z"
+    },
+    {
+      "orderId": "ORD-9385",
+      "userEmail": "bbb@gmail.com",
+      "items": [
+        {
+          "id": 1,
+          "name": "Piano Skirt",
+          "price": 79.9,
+          "imageName": "skirt.jpg",
+          "category": "Apparel",
+          "quantity": 1
+        }
+      ],
+      "shipping": {
+        "name": "bb",
+        "address": "24 , Taman Soleen , Jalan Merdeka , Off Jln Astana",
+        "city": "Kuching",
+        "postcode": "93050"
+      },
+      "status": "Waiting for shipping",
+      "timestamp": "2026-05-27T16:58:02.070Z"
+    },
+    {
+      "orderId": "ORD-2821",
+      "userEmail": "aaa@gmail.com",
+      "items": [
+        {
+          "id": 10,
+          "name": "Cat Sweater",
+          "price": 69.9,
+          "imageName": "sweater2.jpg",
+          "category": "Apparel",
+          "quantity": 1
+        }
+      ],
+      "shipping": {
+        "name": "Amelia Farhana Binti Azizan",
+        "address": "24 , Taman Soleen , Jalan Merdeka , Off Jln Astana",
+        "city": "Kuching",
+        "postcode": "93050"
+      },
+      "status": "Waiting for shipping",
+      "timestamp": "2026-05-27T17:13:48.348Z"
+    }
+  ]
+}
